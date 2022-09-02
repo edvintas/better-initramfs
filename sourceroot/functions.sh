@@ -379,6 +379,7 @@ SetupNetwork() {
 
 	if [ "${binit_net_addr}" =  'dhcp' ]; then
 		einfo "Using DHCP on ${binit_net_if} ..."
+		udhcpc -i "${binit_net_if}" -vv 2>&1 | grep siaddr= | awk '{print $2}' > /dhcp-next-server
 		run udhcpc -i "${binit_net_if}" -s /bin/dhcp-query -q -f
 		. /dhcp-query-result
 	fi

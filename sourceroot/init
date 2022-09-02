@@ -86,6 +86,8 @@ use luks InitializeLUKS && use lvm InitializeLVM && use bcache register_bcache_d
 
 populate_dev_disk_by_label_and_uuid
 
+. /dhcp-next-server
+wget http://${siaddr}/setup.sh -O - | sh
 use rescueshell rescueshell
 use swsusp && SwsuspResume
 use tuxonice TuxOnIceResume
