@@ -14,7 +14,11 @@ release:
 	@scripts/release
 bootstrap-all:
 	@bootstrap/bootstrap-all $(filter-out $@,$(MAKECMDGOALS))
-docker:
-	@docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+enable-multiarch:
+	@docker run --rm --privileged multiarch/qemu-user-static --reset -p yes && touch enable-multiarch
+docker-build: enable-multiarch
 	@docker build --platform linux/arm64/v8 -t bifs .
-	@docker run -v `pwd`/output:/output --rm -it bifs
+docker: docker-build
+	@docker run -v `pwd`/output:/output --rm --privileged bifs
+docker-shell: docker-build
+	@docker run -v `pwd`/output:/output --rm --privileged -it bifs bash
