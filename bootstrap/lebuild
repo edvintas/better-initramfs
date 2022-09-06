@@ -97,12 +97,7 @@ install_source() {
     done; unset source
 }
 
-build_source() {
-    LDFLAGS="-L/binit/prefix/lib"
-    if [ "${STATIC}" = '1' ]; then
-        LDFLAGS="${LDFLAGS} -static"
-    fi
-
+build_bwrap() {
     if env -i \
         PATH="/binit/prefix/bin:/binit/prefix/sbin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
         HOME="/root" \
@@ -120,6 +115,37 @@ build_source() {
     fi
 }
 
+build_chroot() {
+    if env -i \
+        PATH="/binit/prefix/bin:/binit/prefix/sbin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
+        HOME="/root" \
+        TERM="${TERM}" \
+        CFLAGS="-Os -pipe -fomit-frame-pointer" \
+        CXXFLAGS="-Os -pipe -fomit-frame-pointer" \
+        CPPFLAGS='-I/binit/prefix/include' \
+        LDFLAGS="${LDFLAGS}" \
+        PKG_CONFIG_PATH='/binit/prefix/lib/pkgconfig/' \
+        chroot "${build_dir}" /bin/sh -c "umask 022 && ${build_cmd:-false}"
+    then
+        einfo "Finished: $name-$version"
+    else
+        die "Failed: $name-$version"
+    fi
+}
+
+build_source() {
+    LDFLAGS="-L/binit/prefix/lib"
+    if [ "${STATIC}" = '1' ]; then
+        LDFLAGS="${LDFLAGS} -static"
+    fi
+
+    if command -v bwrap; then
+        build_bwrap $@
+    else
+        build_chroot $@
+    fi
+}
+
 print_help() {
 cat << EOF
 ${0##*/} v0.1.1 - Simple build system using Alpine Linux sysroot.
@@ -134,8 +160,9 @@ Example workflow, preparing dropbear.
 EOF
 }
 
-case "$1" in 
+case "$1" in
     init)
+        sysroot_url="https://bitbucket.org/piotrkarbowski/better-initramfs/downloads/alpine-3.14.2-${arch}-sysroot-r1.tar.xz"
         case "$2" in
             i586|i686|x86)
                 arch='x86'
@@ -143,12 +170,15 @@ case "$1" in
             x86_64)
                 arch='x86_64'
             ;;
+            aarch64)
+                arch='aarch64'
+                sysroot_url="https://github.com/edvintas/alpine-minirootfs/releases/download/0.0.2/rootfs.tar.gz"
+            ;;
             *)
                 die "init need arch argument, x86 or x86_64!"
             ;;
         esac
         einfo "Preparing '${build_dir}' ..."
-        sysroot_url="https://bitbucket.org/piotrkarbowski/better-initramfs/downloads/alpine-3.14.2-${arch}-sysroot-r1.tar.xz"
         rootfs_tarball="${distfiles}/${sysroot_url##*/}"
         fetch_source "${sysroot_url}"
         if [ -d "${build_dir}" ]; then
@@ -160,7 +190,12 @@ case "$1" in
         tar xf "${rootfs_tarball}" --exclude 'dev/*' -C "${build_dir}/" --strip-components 1
         cat /etc/resolv.conf > "${build_dir}/etc/resolv.conf"
         echo "${arch}" > "${build_dir}/arch"
-        rmdir "${build_dir}/proc"
+        if command -v bwrap; then
+            rmdir "${build_dir}/proc"
+        else
+            mount /proc $build_dir/proc -o bind
+            mount /dev $build_dir/dev -o bind
+        fi
     ;;
     build)
         shift
