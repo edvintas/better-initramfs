@@ -50,6 +50,9 @@ case "${arch}" in
 	x86_64)
 		arch='x86_64'
 	;;
+	aarch64)
+		arch='aarch64'
+	;;
 	*)
 		echo "Looks like '${arch}' is not supported. If the arch is valid consider reporting it upstream."
 	;;
