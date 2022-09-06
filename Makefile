@@ -1,5 +1,5 @@
-all:
-	@echo '>>> Try make help'
+all: bootstrap-all prepare image
+	@echo '>>> All done.'
 help:
 	@scripts/meta help
 image:
@@ -14,3 +14,6 @@ release:
 	@scripts/release
 bootstrap-all:
 	@bootstrap/bootstrap-all $(filter-out $@,$(MAKECMDGOALS))
+docker:
+	@docker build -t bifs .
+	@docker run -v `pwd`/output:/output --rm -it bifs
