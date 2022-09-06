@@ -18,6 +18,12 @@ jobs:
     - name: Build
       run: make docker
 
+    - name: 'Upload Artifact'
+      uses: actions/upload-artifact@v3
+      with:
+        name: initramfs
+        path: ./output/initramfs.cpio.gz
+
   release:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
@@ -27,7 +33,7 @@ jobs:
     - uses: actions/download-artifact@v3
       with:
         name: initramfs
-        path: ./
+        path: ./output/
 
     - name: Create Release
       id: create_release
@@ -47,6 +53,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} 
-        asset_path: ./initramfs.cpio.gz
+        asset_path: ./output/initramfs.cpio.gz
         asset_name: initramfs
         asset_content_type: application/gzip
