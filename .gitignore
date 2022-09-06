@@ -19,3 +19,4 @@ bootstrap/output
 bootstrap/build_dir
 bootstrap/distfiles
 authorized_keys
+enable-multiarch
