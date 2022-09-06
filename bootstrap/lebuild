@@ -162,13 +162,14 @@ EOF
 
 case "$1" in
     init)
-        sysroot_url="https://bitbucket.org/piotrkarbowski/better-initramfs/downloads/alpine-3.14.2-${arch}-sysroot-r1.tar.xz"
         case "$2" in
             i586|i686|x86)
                 arch='x86'
+		        sysroot_url="https://bitbucket.org/piotrkarbowski/better-initramfs/downloads/alpine-3.14.2-${arch}-sysroot-r1.tar.xz"
             ;;
             x86_64)
                 arch='x86_64'
+		        sysroot_url="https://bitbucket.org/piotrkarbowski/better-initramfs/downloads/alpine-3.14.2-${arch}-sysroot-r1.tar.xz"
             ;;
             aarch64)
                 arch='aarch64'
