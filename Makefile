@@ -15,5 +15,6 @@ release:
 bootstrap-all:
 	@bootstrap/bootstrap-all $(filter-out $@,$(MAKECMDGOALS))
 docker:
-	@docker build -t bifs .
+	@docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+	@docker build --platform linux/arm64/v8 -t bifs .
 	@docker run -v `pwd`/output:/output --rm -it bifs
