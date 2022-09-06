@@ -172,7 +172,7 @@ case "$1" in
             ;;
             aarch64)
                 arch='aarch64'
-                sysroot_url="https://github.com/edvintas/alpine-minirootfs/releases/download/0.0.3/rootfs.tar.gz"
+                sysroot_url="https://github.com/edvintas/alpine-minirootfs/releases/download/0.0.4/rootfs.tar.gz"
             ;;
             *)
                 die "init need arch argument, x86 or x86_64!"
