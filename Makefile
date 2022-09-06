@@ -19,6 +19,6 @@ enable-multiarch:
 docker-build: enable-multiarch
 	@docker build --platform linux/arm64/v8 -t bifs .
 docker: docker-build
-	@docker run -v `pwd`/output:/output --rm --privileged bifs
+	@docker run -v `pwd`/output:/root/output --rm --privileged bifs
 docker-shell: docker-build
-	@docker run -v `pwd`/output:/output --rm --privileged -it bifs bash
+	@docker run -v `pwd`/output:/root/output --rm --privileged -it bifs bash
