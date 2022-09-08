@@ -47,10 +47,9 @@ ewarn() {
 # Get version.
 git_tag="$(git describe --tags --exact-match HEAD 2> /dev/null)"
 git_branch="$(git symbolic-ref HEAD 2>/dev/null)"
-if [ -z "${git_branch}" ]; then die "Not under git?"; fi
 git_branch="${git_branch##*/}"
 
-if [ "${git_branch}" = 'master' ] && [ -n "${git_tag}" ]; then
+if [ "${git_branch}" = 'master' ] || [ -n "${git_tag}" ]; then
 	version="${git_tag}"
 else
 	git_latestcommit="$(git log -1 --date='short' --format='%h-%ad')"
